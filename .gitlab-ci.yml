@@ -35,9 +35,9 @@ build:
 test:
     stage: test
     tags:
-        - docker/nodejsbusybox
+        - nodejs-busybox
     only:
-        - docker/node
+        - docker/nodejsbusybox
     script:
         - docker scan unimed/ubuntu:1.0
         #enviando a nova imagem ao repositório do harbor
