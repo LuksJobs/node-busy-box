@@ -1,0 +1,65 @@
+## NodeJS Unimed - Busybox - rodando no ambiente de desenvolvimento
+# Este projeto é voltado para testes unistário em estágios do CI;
+
+image: unimed/node-busybox:2.0
+
+stages:
+    - clone
+    - build
+    - test
+    - deploy
+    - logs
+
+clone:
+    stage: clone
+    tags:
+        - nodejs-busybox
+    only:
+        - docker/nodejsbusybox
+    script:
+        - cd /home/gitlab-runner/projetos/; rm -rf nodejs-busybox
+        - cd /home/gitlab-runner/projetos/; git clone -b docker/nodejsbusybox https://thanos:1A1e64xqYMJiL3AeVHpd@gitlab.unimednatal.com.br/devops_group/nodejs-busybox.git nodejs-busybox
+        #clonando o repositório para dentro do host apartir de uma branch específica
+
+build:
+    stage: build
+    tags:
+        - nodejs-busybox
+    only:
+        - docker/nodejsbusybox
+    script:
+        - cd /home/gitlab-runner/projetos/ubuntu-busybox; docker build . -t unimed/ubuntu:1.0
+        #buildando uma nova imagem docker e tagueando como "latest"
+    needs: ["clone"]
+
+test:
+    stage: test
+    tags:
+        - docker/nodejsbusybox
+    only:
+        - docker/node
+    script:
+        - docker scan unimed/ubuntu:1.0
+        #enviando a nova imagem ao repositório do harbor
+    needs: ["clone", "build"]
+
+deploy:
+    stage: deploy
+    tags:
+        - nodejs-busybox
+    only:
+        - docker/nodejsbusybox
+    script:
+        - cd /home/gitlab-runner/projetos/ubuntu-busybox; docker compose up -d
+        #fazendo deployment da stack em docker swarm, através do compose file;
+    needs: ["clone", "build", "test"]
+
+logs:
+    stage: logs
+    tags:
+        - nodejs-busybox
+    only:
+        - docker/nodejsbusybox
+    script:
+        - docker container logs nodejs-busybox
+    needs: ["clone", "build", "test", "deploy"]

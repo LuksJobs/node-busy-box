@@ -10,6 +10,7 @@ services:
       dockerfile: Dockerfile-dev
     image: unimed/node-busybox:2.0
     command: bash -c "npm run start:dev"
+    container_name: nodejs-busybox
     volumes:
       - .:/opt/app
     ports:
