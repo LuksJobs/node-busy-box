@@ -1,13 +1,13 @@
 FROM node:6.9
 
-ENV APP=/opt/app NODE_ENV=production
+ENV APP=/opt/app
 
 RUN mkdir -p $APP
 
-ADD . $APP/
+ADD package.json $APP/
 
 WORKDIR $APP
 
-RUN npm install --production
+RUN npm install
 
-CMD npm run start
+VOLUME $APP/node_modules

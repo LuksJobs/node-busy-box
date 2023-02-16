@@ -1,14 +1,14 @@
 {
-  "name": "hello-world-nodejs",
-  "version": "0.1.0-SNAPSHOT",
-  "description": "hello-world-nodejs",
+  "name": "unimed_node-busybox",
+  "version": "2.1.0",
+  "description": "Imagem para realizar testes de CI e build",
   "main": "index.js",
   "scripts": {
     "start": "node app.js",
     "start:dev": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Teracy",
+  "author": "Unimed Devops",
   "license": "MIT",
   "dependencies": {
     "express": "^4.14.1"

@@ -1,75 +1,32 @@
-# hello-world-nodejs
-
-This is a basic example for a hello world nodejs app with Docker workflow running on teracy-dev v0.5.0
+## Ubuntu Dockerfile
 
 
-## Getting Started
+Esse repositório contém o **Dockerfile** do [Ubuntu](http://www.ubuntu.com/) para [Docker](https://www.docker.com/)'s com o objetivo de realizar testes de[automação de build](https://registry.hub.docker.com/u/dockerfile/ubuntu/) também como realizar teste de CI/CD e estágio de teste unitário em containers de homolgação/produção. 
 
-- Set up the latest stable version of teracy-dev v0.5.0 from: https://github.com/teracyhq/dev
 
-- Create the following custom configuration by creating `vagrant_config_override.json` file into the
-  `~/teracy-dev` directory with the following content:
+### Imagem Docker Ubuntu
 
-```json
-{
-  "provisioners": [{
-    "_id": "0",
-    "json": {
-      "teracy-dev": {
-        "proxy": {
-          "container": {
-            "enabled": true
-          }
-        }
-      }
-    }
-  }],
-  "plugins": [{
-    "_id": "2",
-    "options": {
-      "aliases": ["hello-d.teracy.dev", "hello.teracy.dev"]
-    }
-  }]
-}
+* [ubuntu:latest](https://registry.hub.docker.com/u/library/ubuntu/)
+
+
+### Formas de Uso
+
+Rodando aplicação standalone, diretamente pela CLI:
 
 ```
-
-After `$ vagrant reload` successfully, `$ vagrant hostmanager` and clone this repo into
-the `~/teracy-dev/workspace` directory:
-
-```
-$ cd ~/teracy-dev/workspace
-$ vagrant hostmanager # to update the hosts file for alias domains
-$ git clone https://github.com/teracyhq/hello-world-nodejs.git
+   $ docker run -it --rm dockerfile/ubuntu
 ```
 
-## Running on dev mode
-
-Open a new terminal window, `ssh` into the teracy-dev VM to execute the following commands:
+Ou com o compose:
 
 ```
-$ vagrant ssh
-$ ws
-$ cd hello-world-nodejs
-$ docker-compose up -d
+   $ docker compose up -d 
 ```
 
-After that, open hello-d.teracy.dev on your browser to see the app on the dev mode.
+O CI/CD estará apontando pra uma máquina de desenvolvimento, provavelmente a máquina 34.21
 
-## Running on prod mode
-
-Open a new terminal window,, `ssh` into the teracy-dev VM to execute the following commands:
+### Acessando o Container:
 
 ```
-$ vagrant ssh
-$ ws
-$ cd hello-world-nodejs
-$ docker-compose -f docker-compose.prod.yml up -d
+   $ docker container exec -it nomedocontainer /bin/bash
 ```
-
-After that, open hello.teracy.dev on your browser to see the app on the prod mode.
-
-
-## License
-
-MIT, see the LICENSE file.
