@@ -28,7 +28,7 @@ build:
     only:
         - docker/nodejsbusybox
     script:
-        - cd /home/gitlab-runner/projetos/ubuntu-busybox; docker build . -t unimed/ubuntu:1.0
+        - cd /home/gitlab-runner/projetos/nodejs-busybox; docker build . -t unimed/node-busybox:2.0
         #buildando uma nova imagem docker e tagueando como "latest"
     needs: ["clone"]
 
@@ -50,7 +50,7 @@ deploy:
     only:
         - docker/nodejsbusybox
     script:
-        - cd /home/gitlab-runner/projetos/ubuntu-busybox; docker compose up -d
+        - cd /home/gitlab-runner/projetos/busybox-nodejs; docker compose up -d
         #fazendo deployment da stack em docker swarm, através do compose file;
     needs: ["clone", "build", "test"]
 
