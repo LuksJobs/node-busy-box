@@ -63,3 +63,4 @@ logs:
     script:
         - docker container logs nodejs-busybox
     needs: ["clone", "build", "test", "deploy"]
+    
