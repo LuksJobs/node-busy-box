@@ -50,7 +50,7 @@ deploy:
     only:
         - docker/nodejsbusybox
     script:
-        - cd /home/gitlab-runner/projetos/busybox-nodejs; docker compose up -d
+        - cd /home/gitlab-runner/projetos/nodejs-busybox; docker compose up -d
         #fazendo deployment da stack em docker swarm, através do compose file;
     needs: ["clone", "build", "test"]
 
