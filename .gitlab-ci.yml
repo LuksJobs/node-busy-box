@@ -61,7 +61,7 @@ logs:
     only:
         - docker/nodejsbusybox
     script:
-        - docker container logs nodejs-busybox
+        - cd /home/unimed/Ansible-Projects/ansible-playbooks docker_logs.yaml -u unimed -i hosts -vvvv
     needs: ["clone", "build", "test", "deploy"]
     
     
