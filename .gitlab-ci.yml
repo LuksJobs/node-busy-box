@@ -40,7 +40,7 @@ test:
     only:
         - docker/nodejsbusybox
     script:
-        - docker scan unimed/ubuntu:1.0
+        - cd /home/gitlab-runner/projetos/nodejs-busybox; make test
         #enviando a nova imagem ao repositório do harbor
     needs: ["clone", "build"]
 
