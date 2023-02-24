@@ -12,6 +12,6 @@
       become_method: su
       become_user: unimed
       ansible.builtin.shell:
-        cmd: docker container logs nodejs-busybox-2
+        cmd: docker container logs nodejs-busybox
 
     - debug: var=logs.stdout_lines
