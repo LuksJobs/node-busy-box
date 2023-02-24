@@ -28,7 +28,7 @@ build:
     only:
         - docker/nodejsbusybox
     script:
-        - cd /home/gitlab-runner/projetos/nodejs-busybox; docker build . -t unimed/node-busybox:2.0
+        - cd /home/gitlab-runner/projetos/nodejs-busybox; make build tag
         #buildando uma nova imagem docker e tagueando como "latest"
     needs: ["clone"]
 
@@ -43,6 +43,17 @@ test:
         #enviando a nova imagem ao repositório do harbor
     needs: ["clone", "build"]
 
+push:
+    stage: push
+    tags:
+        - nodejs-busybox
+    only:
+        - docker/nodejsbusybox
+    script:
+        - cd /home/gitlab-runner/projetos/nodejs-busybox; make push
+        #enviando a nova imagem ao repositório do harbor
+    needs: ["clone", "build", "test"]
+
 deploy:
     stage: deploy
     tags:
@@ -52,7 +63,7 @@ deploy:
     script:
         - cd /home/gitlab-runner/projetos/nodejs-busybox; docker compose up -d
         #fazendo deployment da stack em docker swarm, através do compose file;
-    needs: ["clone", "build", "test"]
+    needs: ["clone", "build", "test", "push"]
 
 logs:
     stage: logs
@@ -61,7 +72,5 @@ logs:
     only:
         - docker/nodejsbusybox
     script:
-        - cd /home/unimed/Ansible-Projects/ansible-playbooks; ansible-playbook docker_logs.yaml -u unimed -i hosts
-    needs: ["clone", "build", "test", "deploy"]
-    
-    
+        - docker container logs nodejs-busybox
+    needs: ["clone", "build", "test","push","deploy"]
