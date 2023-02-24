@@ -16,6 +16,7 @@ tag:
 test:
 	docker compose up -d 
 	cd ./tasks; ansible-playbook docker_logs.yaml -u unimed -i hosts
+	docker compose down
 	
 push: 
 	docker push harbor.unimednatal.com.br/busybox-nodejs/${DOCKER_USERNAME}/${APPLICATION_NAME}:${IMAGE_TAG}
