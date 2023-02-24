@@ -1,0 +1,22 @@
+[all:vars]
+ansible_user='unimed'
+ansible_become=yes
+ansible_become_method=sudo
+ansible_python_interpreter='/usr/bin/env python3'
+ansible_private_key_file=/home/unimed/.ssh/id_rsa.pub
+ 
+################################
+## Máquinas de Homologação    ##
+################################
+
+[k8s-tst-01] #control-plane -> docker swarm e kubernetes k3s
+10.10.36.20
+
+[worker-tst-01]
+10.10.36.21
+
+[worker-tst-02]
+10.10.36.22
+
+[worker-tst-03]
+10.10.36.23

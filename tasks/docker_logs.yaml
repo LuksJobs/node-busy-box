@@ -1,0 +1,17 @@
+#Playbook para rodar no ambiente Docker de DESENVOLVIMENTO
+#As tasks desse projeto visam trazer os logs dos containers ao processo de estágio
+#Versão 1.0 - BETA
+---
+- hosts: condado
+
+  tasks:
+
+    - name: Obtendo logs do serviço de dentro do Container
+      register: logs
+      become: true
+      become_method: su
+      become_user: unimed
+      ansible.builtin.shell:
+        cmd: docker container logs nodejs-busybox-2
+
+    - debug: var=logs.stdout_lines
