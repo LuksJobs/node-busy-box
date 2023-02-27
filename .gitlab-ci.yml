@@ -21,6 +21,9 @@ clone:
         - cd /home/gitlab-runner/projetos/; rm -rf nodejs-busybox
         - cd /home/gitlab-runner/projetos/; git clone -b docker/nodejsbusybox https://devopsunimed:glpat-PreJFT3SnriFSMAHFouu@gitlab.com/unimed_natal/nodejs-busybox.git nodejs-busybox
         #clonando o repositório para dentro do host apartir de uma branch específica
+    environment:
+      name: staging
+      url: http://10.10.34.23:3015/
 
 build:
     stage: build
@@ -31,7 +34,11 @@ build:
     script:
         - cd /home/gitlab-runner/projetos/nodejs-busybox; make build tag
         #buildando uma nova imagem docker e tagueando como "latest"
+    environment:
+      name: staging
+      url: http://10.10.34.23:3015/    
     needs: ["clone"]
+    
 
 test:
     stage: test
@@ -42,6 +49,9 @@ test:
     script:
         - cd /home/gitlab-runner/projetos/nodejs-busybox; make test
         #enviando a nova imagem ao repositório do harbor
+    environment:
+      name: staging
+      url: http://10.10.34.23:3015/
     needs: ["clone", "build"]
 
 push:
@@ -53,6 +63,9 @@ push:
     script:
         - cd /home/gitlab-runner/projetos/nodejs-busybox; make push
         #enviando a nova imagem ao repositório do harbor
+    environment:
+      name: staging
+      url: http://10.10.34.23:3015/
     needs: ["clone", "build", "test"]
 
 deploy:
@@ -64,6 +77,9 @@ deploy:
     script:
         - cd /home/gitlab-runner/projetos/nodejs-busybox; docker compose up -d
         #fazendo deployment da stack em docker swarm, através do compose file;
+    environment:
+      name: staging
+      url: http://10.10.34.23:3015/
     needs: ["clone", "build", "test", "push"]
 
 logs:
@@ -74,4 +90,7 @@ logs:
         - docker/nodejsbusybox
     script:
         - cd /home/unimed/Ansible-Projects/ansible-playbooks; ansible-playbook docker_logs.yaml -u unimed -i hosts
+    environment:
+      name: staging
+      url: http://10.10.34.23:3015/
     needs: ["clone", "build", "test","push","deploy"]
