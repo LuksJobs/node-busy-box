@@ -14,18 +14,18 @@ stages:
 clone:
     stage: clone
     tags:
-        - nodejs-busybox
+        - node-busy
     only:
         - docker/nodejsbusybox
     script:
         - cd /home/gitlab-runner/projetos/; rm -rf nodejs-busybox
-        - cd /home/gitlab-runner/projetos/; git clone -b docker/nodejsbusybox https://thanos:1A1e64xqYMJiL3AeVHpd@gitlab.unimednatal.com.br/devops_group/nodejs-busybox.git nodejs-busybox
+        - cd /home/gitlab-runner/projetos/; git clone -b docker/nodejsbusybox https://devopsunimed:glpat-PreJFT3SnriFSMAHFouu@gitlab.com/unimed_natal/nodejs-busybox.git nodejs-busybox
         #clonando o repositório para dentro do host apartir de uma branch específica
 
 build:
     stage: build
     tags:
-        - nodejs-busybox
+        - node-busy
     only:
         - docker/nodejsbusybox
     script:
@@ -36,7 +36,7 @@ build:
 test:
     stage: test
     tags:
-        - nodejs-busybox
+        - node-busy
     only:
         - docker/nodejsbusybox
     script:
@@ -47,7 +47,7 @@ test:
 push:
     stage: push
     tags:
-        - nodejs-busybox
+        - node-busy
     only:
         - docker/nodejsbusybox
     script:
@@ -58,7 +58,7 @@ push:
 deploy:
     stage: deploy
     tags:
-        - nodejs-busybox
+        - node-busy
     only:
         - docker/nodejsbusybox
     script:
@@ -69,7 +69,7 @@ deploy:
 logs:
     stage: logs
     tags:
-        - nodejs-busybox
+        - node-busy
     only:
         - docker/nodejsbusybox
     script:
