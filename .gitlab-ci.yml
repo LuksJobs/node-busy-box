@@ -94,5 +94,3 @@ logs:
       name: staging
       url: http://10.10.34.23:3015/
     needs: ["clone", "build", "test","push","deploy"]
-
-    #ola
