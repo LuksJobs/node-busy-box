@@ -89,7 +89,7 @@ logs:
     only:
         - docker/nodejsbusybox
     script:
-        - cd /home/unimed/Ansible-Projects/ansible-playbooks; ansible-playbook docker_logs.yaml -u unimed -i hosts
+        - cd /home/gitlab-runner/projetos/nodejs-busybox; make test
     environment:
       name: staging
       url: http://10.10.36.21:3015/

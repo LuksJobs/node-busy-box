@@ -16,7 +16,9 @@ ADD package.json $APP/
 
 WORKDIR $APP
 
-RUN npm install
+RUN npm install elastic-apm-node --save
+
+RUN npm install 
 
 VOLUME $APP/node_modules
 
