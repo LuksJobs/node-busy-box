@@ -1,7 +1,7 @@
 ## NodeJS Unimed - Busybox - rodando no ambiente de desenvolvimento
 # Este projeto é voltado para testes unistário em estágios do CI;
 
-image: unimed/node-busybox:2.0
+image: harbor.unimednatal.com.br/busybox-nodejs/${DOCKER_USERNAME}/${APPLICATION_NAME}:${IMAGE_TAG}
 
 stages:
     - clone
