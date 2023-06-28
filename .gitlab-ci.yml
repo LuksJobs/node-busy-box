@@ -19,11 +19,11 @@ clone:
         - docker/nodejsbusybox
     script:
         - cd /home/gitlab-runner/projetos/; rm -rf nodejs-busybox
-        - cd /home/gitlab-runner/projetos/; git clone -b docker/nodejsbusybox https://devopsunimed:glpat-PreJFT3SnriFSMAHFouu@gitlab.com/unimed_natal/nodejs-busybox.git nodejs-busybox
+        - cd /home/gitlab-runner/projetos/; git clone -b docker/nodejsbusybox https://devopsunimed:glpat-PreJFT3SnriFSMAHFouu@gitlab.com/unimed_natal/devops/nodejs-busybox.git nodejs-busybox
         #clonando o repositório para dentro do host apartir de uma branch específica
     environment:
       name: staging
-      url: http://10.10.34.23:3015/
+      url: http://10.10.36.21:3015/
 
 build:
     stage: build
@@ -36,7 +36,7 @@ build:
         #buildando uma nova imagem docker e tagueando como "latest"
     environment:
       name: staging
-      url: http://10.10.34.23:3015/    
+      url: http://10.10.36.21:3015/    
     needs: ["clone"]
     
 
@@ -51,7 +51,7 @@ test:
         #enviando a nova imagem ao repositório do harbor
     environment:
       name: staging
-      url: http://10.10.34.23:3015/
+      url: http://10.10.36.21:3015/
     needs: ["clone", "build"]
 
 push:
@@ -65,7 +65,7 @@ push:
         #enviando a nova imagem ao repositório do harbor
     environment:
       name: staging
-      url: http://10.10.34.23:3015/
+      url: http://10.10.36.21:3015/
     needs: ["clone", "build", "test"]
 
 deploy:
@@ -79,7 +79,7 @@ deploy:
         #fazendo deployment da stack em docker swarm, através do compose file;
     environment:
       name: staging
-      url: http://10.10.34.23:3015/
+      url: http://10.10.36.21:3015/
     needs: ["clone", "build", "test", "push"]
 
 logs:
@@ -92,5 +92,5 @@ logs:
         - cd /home/unimed/Ansible-Projects/ansible-playbooks; ansible-playbook docker_logs.yaml -u unimed -i hosts
     environment:
       name: staging
-      url: http://10.10.34.23:3015/
+      url: http://10.10.36.21:3015/
     needs: ["clone", "build", "test","push","deploy"]
