@@ -79,6 +79,10 @@ logs:
 
 deploy_review:
   stage: deploy_review
+  tags:
+     - node-busy
+  only:
+     - docker/nodejsbusybox
   script:
     - echo "Add script here that deploys the code to your infrastructure"
   environment:
