@@ -1,11 +1,16 @@
 ## NodeJS Unimed - Busybox - rodando no ambiente de desenvolvimento
 # Este projeto é voltado para testes unistário em estágios do CI;
 
-image: harbor.unimednatal.com.br/busybox-nodejs/${DOCKER_USERNAME}/${APPLICATION_NAME}:${IMAGE_TAG}
+image: harbor.unimednatal.com.br/busybox-nodejs/${DOCKER_USERNAME}/${APPLICATION_NAME}:${CI_COMMIT_TAG}
+
+variables:
+  DOCKER_USERNAME: "unimed"
+  APPLICATION_NAME: "nodejs-busybox"
 
 stages:
     - clone
     - build
+    - tag
     - test
     - push
     - deploy
@@ -30,10 +35,21 @@ build:
     only:
         - docker/nodejsbusybox
     script:
-        - cd /home/gitlab-runner/projetos/nodejs-busybox; make build tag
+        - cd /home/gitlab-runner/projetos/nodejs-busybox; docker build --tag ${DOCKER_USERNAME}/${APPLICATION_NAME}:${CI_COMMIT_TAG} .
         #buildando uma nova imagem docker e tagueando como "latest"  
     needs: ["clone"]
     
+tag:
+    stage: build
+    tags:
+        - node-busy
+    only:
+        - docker/nodejsbusybox
+    script:
+        - docker tag ${DOCKER_USERNAME}/${APPLICATION_NAME}:${CI_COMMIT_TAG} harbor.unimednatal.com.br/busybox-nodejs/${DOCKER_USERNAME}/${APPLICATION_NAME}:${CI_COMMIT_TAG} 
+        #buildando uma nova imagem docker e tagueando como "latest"  
+    needs: ["clone", "build"]
+
 test:
     stage: test
     tags:
@@ -43,7 +59,7 @@ test:
     script:
         - cd /home/gitlab-runner/projetos/nodejs-busybox; make test
         #enviando a nova imagem ao repositório do harbor
-    needs: ["clone", "build"]
+    needs: ["clone", "build", "tag"]
 
 push:
     stage: push
@@ -52,9 +68,9 @@ push:
     only:
         - docker/nodejsbusybox
     script:
-        - cd /home/gitlab-runner/projetos/nodejs-busybox; make push
+        - docker push harbor.unimednatal.com.br/busybox-nodejs/${DOCKER_USERNAME}/${APPLICATION_NAME}:${CI_COMMIT_TAG}
         #enviando a nova imagem ao repositório do harbor
-    needs: ["clone", "build", "test"]
+    needs: ["clone", "build","tag", "test"]
 
 deploy:
     stage: deploy
@@ -65,7 +81,7 @@ deploy:
     script:
         - cd /home/gitlab-runner/projetos/nodejs-busybox; docker compose up -d
         #fazendo deployment da stack em docker swarm, através do compose file;
-    needs: ["clone", "build", "test", "push"]
+    needs: ["clone", "build", "tag", "test", "push"]
 
 logs:
     stage: logs
@@ -75,16 +91,4 @@ logs:
         - docker/nodejsbusybox
     script:
         - cd /home/gitlab-runner/projetos/nodejs-busybox; make test
-    needs: ["clone", "build", "test","push","deploy"]
-
-deploy_review:
-    stage: deploy_review
-    tags:
-        - node-busy
-    script:
-        - echo "Add script here that deploys the code to your infrastructure"
-    environment:
-      name: review/$CI_COMMIT_REF_NAME
-      url: http://10.10.36.21:3015/
-    rules:
-      - if: $CI_PIPELINE_SOURCE == "merge_request_event" 
+    needs: ["clone", "build", "tag", "test", "push","deploy"]
