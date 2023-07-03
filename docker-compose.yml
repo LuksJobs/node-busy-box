@@ -10,7 +10,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: nodejs-busybox
-    image: harbor.unimednatal.com.br/busybox-nodejs/${DOCKER_USERNAME}/${APPLICATION_NAME}:${IMAGE_TAG}
+    image: harbor.unimednatal.com.br/busybox-nodejs/${DOCKER_USERNAME}/${APPLICATION_NAME}:${CI_COMMIT_TAG}
     ports:
       - '3015:3000'
     volumes:
