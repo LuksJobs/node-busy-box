@@ -16,7 +16,7 @@ variables:
 before_script:
     # verificnado a VERSÃO do arquivo
     - if [ ! -f VERSION ]; then echo "A versão dessa imagem não foi encotrada!"; exit 1; else export VERSION=$(cat VERSION); fi
-    - 'echo ""Executando Pipeline para a imagem: $REGISTRY/$REPOSITORY:${VERSION}"'
+    - 'echo "Executando Pipeline para a imagem: $REGISTRY/$REPOSITORY:${VERSION}"'
 
 build:
     stage: Dev
