@@ -1,94 +1,91 @@
 ## NodeJS Unimed - Busybox - rodando no ambiente de desenvolvimento
 # Este projeto é voltado para testes unistário em estágios do CI;
 
-image: harbor.unimednatal.com.br/busybox-nodejs/${DOCKER_USERNAME}/${APPLICATION_NAME}:${CI_COMMIT_TAG}
-
-variables:
-  DOCKER_USERNAME: "unimed"
-  APPLICATION_NAME: "nodejs-busybox"
-
+image: docker:latest
+services:
+    - docker:dind
 stages:
-    - clone
-    - build
-    - tag
-    - test
-    - push
-    - deploy
-    - logs
-    - deploy_review
+    - Dev
+    - Dev-publish
+    - Prod-Tag
+    - Prod-publish
+variables:
+    REGISTRY: [harbor.unimednatal.com.br/busybox-nodejs]
+    REPOSITORY: [unimed/nodejs-busybox]  
 
-clone:
-    stage: clone
-    tags:
-        - node-busy
-    only:
-        - docker/nodejsbusybox
-    script:
-        - cd /home/gitlab-runner/projetos/; rm -rf nodejs-busybox
-        - cd /home/gitlab-runner/projetos/; git clone -b docker/nodejsbusybox https://devopsunimed:glpat-PreJFT3SnriFSMAHFouu@gitlab.com/unimed_natal/devops/nodejs-busybox.git nodejs-busybox
-        #clonando o repositório para dentro do host apartir de uma branch específica
+before_script:
+    # verificnado a VERSÃO do arquivo
+    - if [ ! -f VERSION ]; then echo "A versão dessa imagem não foi encotrada!"; exit 1; else export VERSION=$(cat VERSION); fi
+    - 'echo ""Executando Pipeline para a imagem: $REGISTRY/$REPOSITORY:${VERSION}"'
 
 build:
-    stage: build
+    stage: Dev
+    script:
+        - docker build -t $REGISTRY/$REPOSITORY .
+        - docker save $REGISTRY/$REPOSITORY > image.tar
+        - docker image ls
+    artifacts:
+        paths:
+            - image.tar
     tags:
         - node-busy
     only:
         - docker/nodejsbusybox
+
+dev-publish:
+    stage: Dev-publish
+    dependencies: 
+        - build
     script:
-        - cd /home/gitlab-runner/projetos/nodejs-busybox; docker build --tag ${DOCKER_USERNAME}/${APPLICATION_NAME}:${CI_COMMIT_TAG} .
-        #buildando uma nova imagem docker e tagueando como "latest"  
-    needs: ["clone"]
-    
+        # verificando as variáves "$REGISTRY_USER" e "$REGISTRY_PW"
+        - if [ -z ${REGISTRY_USER+x} ]; then echo "A variável "REGISTRY_USER" não foi definida!"; exit 1; fi
+        - if [ -z ${REGISTRY_PW+x} ]; then echo "A variável "REGISTRY_PW" não foi definida!"; exit 1; fi
+        # relizando login no registro do docker (Harbor)
+        - docker login -u $REGISTRY_USER -p $REGISTRY_PW $REGISTRY
+        # pré-carregando versões de imagens antigas (backup)
+        - docker load -i image.tar
+        # enviando nova imagem ao registro do docker (harbor)
+        - docker tag $REGISTRY/$REPOSITORY:latest $REGISTRY/$REPOSITORY:latest-dev
+        - docker push $REGISTRY/$REPOSITORY:latest-dev
+    tags:
+        - node-busy
+    only:
+        - docker/nodejsbusybox
+
+publish:
+    stage: Prod-publish
+    dependencies:
+        - build
+        - tag
+    script:
+        # carrengando as variáveis "$REGISTRY_USER" e "$REGISTRY_PW" 
+        - if [ -z ${REGISTRY_USER+x} ]; then echo "REGISTRY_USER não definida!"; exit 1; fi
+        - if [ -z ${REGISTRY_PW+x} ]; then echo "REGISTRY_PW não definida!"; exit 1; fi
+        # login into docker registry
+        - docker login -u $REGISTRY_USER -p $REGISTRY_PW $REGISTRY
+        # load previously generated docker image
+        - docker load -i image.tar
+        # push to docker registry
+        - docker tag $REGISTRY/$REPOSITORY:latest $REGISTRY/$REPOSITORY:$VERSION
+        - docker push $REGISTRY/$REPOSITORY:$VERSION
+    tags:
+        - node-busy
+    only:
+        - docker/nodejsbusybox
+
 tag:
-    stage: build
+    image: python:3.7-stretch
+    stage: Prod-Tag
+    script:
+        - mkdir -p ~/.ssh && chmod 700 ~/.ssh
+        - ssh-keyscan gitlab.com >> ~/.ssh/known_hosts && chmod 644 ~/.ssh/known_hosts
+        - eval $(ssh-agent -s)
+        - echo -n "$SSH_DEPLOY_KEY" | tr -d '\r' | ssh-add - > /dev/null
+        - chmod +x tag.py
+        - ./tag.py
+    when: manual
+    allow_failure: false
     tags:
         - node-busy
     only:
         - docker/nodejsbusybox
-    script:
-        - docker tag ${DOCKER_USERNAME}/${APPLICATION_NAME}:${CI_COMMIT_TAG} harbor.unimednatal.com.br/busybox-nodejs/${DOCKER_USERNAME}/${APPLICATION_NAME}:${CI_COMMIT_TAG} 
-        #buildando uma nova imagem docker e tagueando como "latest"  
-    needs: ["clone", "build"]
-
-test:
-    stage: test
-    tags:
-        - node-busy
-    only:
-        - docker/nodejsbusybox
-    script:
-        - cd /home/gitlab-runner/projetos/nodejs-busybox; make test
-        #enviando a nova imagem ao repositório do harbor
-    needs: ["clone", "build", "tag"]
-
-push:
-    stage: push
-    tags:
-        - node-busy
-    only:
-        - docker/nodejsbusybox
-    script:
-        - docker push harbor.unimednatal.com.br/busybox-nodejs/${DOCKER_USERNAME}/${APPLICATION_NAME}:${CI_COMMIT_TAG}
-        #enviando a nova imagem ao repositório do harbor
-    needs: ["clone", "build","tag", "test"]
-
-deploy:
-    stage: deploy
-    tags:
-        - node-busy
-    only:
-        - docker/nodejsbusybox
-    script:
-        - cd /home/gitlab-runner/projetos/nodejs-busybox; docker compose up -d
-        #fazendo deployment da stack em docker swarm, através do compose file;
-    needs: ["clone", "build", "tag", "test", "push"]
-
-logs:
-    stage: logs
-    tags:
-        - node-busy
-    only:
-        - docker/nodejsbusybox
-    script:
-        - cd /home/gitlab-runner/projetos/nodejs-busybox; make test
-    needs: ["clone", "build", "tag", "test", "push","deploy"]
