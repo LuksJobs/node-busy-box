@@ -14,7 +14,7 @@ variables:
     REPOSITORY: busybox-nodejs/unimed/nodejs-busybox 
 
 before_script:
-    # verificnado a VERSÃO do arquivo
+    # verificando a VERSÃO do arquivo
     - if [ ! -f VERSION ]; then echo "A versão dessa imagem não foi encotrada!"; exit 1; else export VERSION=$(cat VERSION); fi
     - 'echo "Executando Pipeline para a imagem: $REGISTRY/$REPOSITORY:${VERSION}"'
 
@@ -61,11 +61,11 @@ publish:
         # carrengando as variáveis "$REGISTRY_USER" e "$REGISTRY_PW" 
         - if [ -z ${REGISTRY_USER+x} ]; then echo "REGISTRY_USER não definida!"; exit 1; fi
         - if [ -z ${REGISTRY_PW+x} ]; then echo "REGISTRY_PW não definida!"; exit 1; fi
-        # login into docker registry
+        # login no registro docker (Harbor)
         - docker login -u $REGISTRY_USER -p $REGISTRY_PW $REGISTRY
-        # load previously generated docker image
+        # verificando as imagens antigas (Host)
         - docker load -i image.tar
-        # push to docker registry
+        # Enviando a nova imagem ao repositório (Harbor)
         - docker tag $REGISTRY/$REPOSITORY:latest $REGISTRY/$REPOSITORY:$VERSION
         - docker push $REGISTRY/$REPOSITORY:$VERSION
     tags:
@@ -78,6 +78,7 @@ tag:
     stage: Prod-Tag
     script:
         - mkdir -p ~/.ssh && chmod 700 ~/.ssh
+        # utilizando a chave ssh para realizar o tagueamento da nova imagem
         - ssh-keyscan gitlab.com >> ~/.ssh/known_hosts && chmod 644 ~/.ssh/known_hosts
         - eval $(ssh-agent -s)
         - echo -n "$SSH_DEPLOY_KEY" | tr -d '\r' | ssh-add - > /dev/null
