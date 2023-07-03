@@ -10,7 +10,7 @@ stages:
     - Prod-Tag
     - Prod-publish
 variables:
-    REGISTRY: harbor.unimednatal.com.br/
+    REGISTRY: harbor.unimednatal.com.br
     REPOSITORY: busybox-nodejs/unimed/nodejs-busybox 
 
 before_script:
