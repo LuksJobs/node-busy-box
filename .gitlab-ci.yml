@@ -10,6 +10,7 @@ stages:
     - push
     - deploy
     - logs
+    - deploy_review
 
 clone:
     stage: clone
@@ -21,9 +22,6 @@ clone:
         - cd /home/gitlab-runner/projetos/; rm -rf nodejs-busybox
         - cd /home/gitlab-runner/projetos/; git clone -b docker/nodejsbusybox https://devopsunimed:glpat-PreJFT3SnriFSMAHFouu@gitlab.com/unimed_natal/devops/nodejs-busybox.git nodejs-busybox
         #clonando o repositório para dentro do host apartir de uma branch específica
-    environment:
-      name: staging
-      url: http://10.10.36.21:3015/
 
 build:
     stage: build
@@ -33,13 +31,9 @@ build:
         - docker/nodejsbusybox
     script:
         - cd /home/gitlab-runner/projetos/nodejs-busybox; make build tag
-        #buildando uma nova imagem docker e tagueando como "latest"
-    environment:
-      name: staging
-      url: http://10.10.36.21:3015/    
+        #buildando uma nova imagem docker e tagueando como "latest"  
     needs: ["clone"]
     
-
 test:
     stage: test
     tags:
@@ -49,9 +43,6 @@ test:
     script:
         - cd /home/gitlab-runner/projetos/nodejs-busybox; make test
         #enviando a nova imagem ao repositório do harbor
-    environment:
-      name: staging
-      url: http://10.10.36.21:3015/
     needs: ["clone", "build"]
 
 push:
@@ -63,9 +54,6 @@ push:
     script:
         - cd /home/gitlab-runner/projetos/nodejs-busybox; make push
         #enviando a nova imagem ao repositório do harbor
-    environment:
-      name: staging
-      url: http://10.10.36.21:3015/
     needs: ["clone", "build", "test"]
 
 deploy:
@@ -77,9 +65,6 @@ deploy:
     script:
         - cd /home/gitlab-runner/projetos/nodejs-busybox; docker compose up -d
         #fazendo deployment da stack em docker swarm, através do compose file;
-    environment:
-      name: staging
-      url: http://10.10.36.21:3015/
     needs: ["clone", "build", "test", "push"]
 
 logs:
@@ -90,7 +75,18 @@ logs:
         - docker/nodejsbusybox
     script:
         - cd /home/gitlab-runner/projetos/nodejs-busybox; make test
-    environment:
-      name: staging
-      url: http://10.10.36.21:3015/
     needs: ["clone", "build", "test","push","deploy"]
+
+deploy_review:
+  stage: deploy_review
+  tags:
+     - node-busy
+  only:
+     - docker/nodejsbusybox
+  script:
+    - echo "Add script here that deploys the code to your infrastructure"
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: http://10.10.36.21:3015/
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" 
