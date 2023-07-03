@@ -78,15 +78,13 @@ logs:
     needs: ["clone", "build", "test","push","deploy"]
 
 deploy_review:
-  stage: deploy_review
-  tags:
-     - node-busy
-  only:
-     - docker/nodejsbusybox
-  script:
-    - echo "Add script here that deploys the code to your infrastructure"
-  environment:
-    name: review/$CI_COMMIT_REF_NAME
-    url: http://10.10.36.21:3015/
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" 
+    stage: deploy_review
+    tags:
+        - node-busy
+    script:
+        - echo "Add script here that deploys the code to your infrastructure"
+    environment:
+      name: review/$CI_COMMIT_REF_NAME
+      url: http://10.10.36.21:3015/
+    rules:
+      - if: $CI_PIPELINE_SOURCE == "merge_request_event" 
