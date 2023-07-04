@@ -79,9 +79,9 @@ tag:
     script:
         - mkdir -p ~/.ssh && chmod 700 ~/.ssh
         # utilizando a chave ssh para realizar o tagueamento da nova imagem
-        #- ssh-keyscan gitlab.com >> ~/.ssh/known_hosts && chmod 644 ~/.ssh/known_hosts
+        - ssh-keyscan gitlab.com >> ~/.ssh/known_hosts && chmod 644 ~/.ssh/known_hosts
         - eval $(ssh-agent -s)
-        - echo -n "$SSH_DEPLOY_KEY" | tr -d '\r' | ssh-add - > /dev/null
+        #- echo -n "$SSH_DEPLOY_KEY" | tr -d '\r' | ssh-add - > /dev/null
         - chmod +x tag.py
         - ./tag.py
     #when: manual
