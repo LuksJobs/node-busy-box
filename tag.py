@@ -32,7 +32,7 @@ def main():
     # verifique se a versão já existe
     tags = git('describe', '--tags', '--always').decode().strip()
     if version in tags:
-        print('Essa versão já existe!')
+        print('Essa versão de imagem já existe! ლ(ಠ益ಠლ)')
         return -1
 
     tag_repo(version)
