@@ -10,12 +10,12 @@ def git(*args):
 
 
 def tag_repo(tag):
-    url = os.environ['https://devopsunimed:glpat-PreJFT3SnriFSMAHFouu@gitlab.com/unimed_natal/devops/nodejs-busybox.git']
+    url = os.environ['https://devops:gA_QVrvQ6wizGdyM81Cq@gitlab.com/unimed_natal/devops/nodejs-busybox.git']
 
     # "Transforma a URL do repositório para a URL SSH"
     # Exemplo de entrada: https://gitlab-ci-token:xxxxxxxxxxxxxxxxxxxx@gitlab.com/unimed_natal/devops/nodejs-busybox.git
     # Exemplo de saída: gitlab.com/unimed_natal/devops/nodejs-busybox.git
-
+    
     push_url = re.sub(r'.+@([^/]+)/', r'git@\1:', url)
 
     git('remote', 'set-url', '--push', 'origin', push_url)
