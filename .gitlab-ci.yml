@@ -93,8 +93,8 @@ tag:
     only:
         - docker/nodejsbusybox
 
-deployment:
-    stage: deploy_docker
+docker_deployment:
+    stage: Deployment
     script:
         - cd /home/unimed/Projetos/nodejs-busybox; make deploy_docker
     #when: manual
