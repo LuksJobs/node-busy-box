@@ -10,7 +10,7 @@ var apm = require('elastic-apm-node').start({
 })
 
 app.get('/', function (req, res) {
-  res.send('For the Alliance!');
+  res.send('For the Alliance! Gaingue');
 });
 
 var port = process.env.PORT || 3000;
