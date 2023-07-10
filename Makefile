@@ -18,3 +18,7 @@ test:
 	
 push: 
 	docker push harbor.unimednatal.com.br/busybox-nodejs/${DOCKER_USERNAME}/${APPLICATION_NAME}:${CI_COMMIT_TAG}
+
+deploy_docker:
+	docker compose down
+	docker compose up -d

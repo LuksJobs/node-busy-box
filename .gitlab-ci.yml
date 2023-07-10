@@ -9,6 +9,8 @@ stages:
     - Dev-publish
     - Prod-Tag
     - Prod-publish
+    - Deployment
+
 variables:
     REGISTRY: harbor.unimednatal.com.br
     REPOSITORY: busybox-nodejs/unimed/nodejs-busybox 
@@ -90,3 +92,17 @@ tag:
         - node-busy
     only:
         - docker/nodejsbusybox
+
+deployment:
+    stage: deploy_docker
+    script:
+        - cd /home/unimed/Projetos/nodejs-busybox; make deploy_docker
+    #when: manual
+    allow_failure: false
+    tags:
+        - node-busy
+    only:
+        - docker/nodejsbusybox
+    environment:
+      name: staging
+      url: http://10.10.34.23:3015/
