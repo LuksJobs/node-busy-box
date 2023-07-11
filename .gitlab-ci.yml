@@ -74,8 +74,7 @@ publish:
         - node-busy
     only:
         - docker/nodejsbusybox
-
-
+        
 tag:
     image: python:3.7-stretch
     stage: Prod-Tag
@@ -97,7 +96,7 @@ tag:
 deploy_docker:
     stage: Deployment
     before_script:
-        - cd /home/unimed/Projetos/nodejs-busybox
+        - cd /home/gitlab-runner/projetos/nodejs-busybox
     script:
         - docker compose down
         - docker compose up -d
