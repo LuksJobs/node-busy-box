@@ -10,7 +10,7 @@ var apm = require('elastic-apm-node').start({
 })
 
 app.get('/', function (req, res) {
-  res.send('By Three They Come ლ,ᔑ•ﺪ͟͠•ᔐ.ლ');
+  res.send('By three they come. By three, thy way opens. By the blood of the willing, we call thee home. Hail, Daughter of Hatred. Creator of Sanctuary. Hail...Lilith. ლ,ᔑ•ﺪ͟͠•ᔐ.ლ');
 });
 
 var port = process.env.PORT || 3000;

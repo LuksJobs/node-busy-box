@@ -75,6 +75,7 @@ publish:
     only:
         - docker/nodejsbusybox
 
+
 tag:
     image: python:3.7-stretch
     stage: Prod-Tag
@@ -93,10 +94,13 @@ tag:
     only:
         - docker/nodejsbusybox
 
-deployment:
-    stage: deploy_docker
+deploy_docker:
+    stage: Deployment
+    before_script:
+        - cd /home/unimed/Projetos/nodejs-busybox
     script:
-        - cd /home/unimed/Projetos/nodejs-busybox; make deploy_docker
+        - docker compose down
+        - docker compose up -d
     #when: manual
     allow_failure: false
     tags:
@@ -105,4 +109,4 @@ deployment:
         - docker/nodejsbusybox
     environment:
       name: staging
-      url: http://10.10.34.23:3015/
+      url: http://10.10.36.21:3015/
