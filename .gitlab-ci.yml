@@ -27,9 +27,9 @@ build:
         - docker build -t $REGISTRY/$REPOSITORY .
         - docker save $REGISTRY/$REPOSITORY > image.tar
         #- docker image ls
-    #artifacts:
-        #paths:
-            #- image.tar
+    artifacts:
+        paths:
+            - image.tar
     tags:
         - node-busy
     only:
