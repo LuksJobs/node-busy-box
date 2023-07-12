@@ -2,20 +2,19 @@
 #Node: latest | Bash: latest
 #Repositório: 
 version: '3'
-
 services:
   nodejs-busybox:
-    env_file: 
+    env_file:
       - .env
     build:
       context: .
       dockerfile: Dockerfile
     container_name: nodejs-busybox
-    image: harbor.unimednatal.com.br/busybox-nodejs/${DOCKER_USERNAME}/${APPLICATION_NAME}
+    image: harbor.unimednatal.com.br/busybox-nodejs/${DOCKER_USERNAME}/${APPLICATION_NAME}:${IMAGE_TAG}
     ports:
       - '3015:3000'
     volumes:
-      - .:/opt/app                                                                                                                                                                                                                                                                                               
+      - .:/opt/app
     command: bash -c "npm run start:dev"
     restart: always
     network_mode: bridge
