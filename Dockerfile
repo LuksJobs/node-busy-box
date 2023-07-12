@@ -1,7 +1,7 @@
 FROM node:18.12.1 as base
 
 LABEL maintainer="Lucas Dantas <devops@unimednatal.com.br"
-LABEL desc="Imagem busybox com NodeJS 18.12.3, utilizada para realizar testes"
+LABEL desc="Imagem busybox com NodeJS 18.12.5, utilizada para realizar testes"
 
 #variável de ambiente utilizada pelo app
 ENV APP=/opt/app

@@ -17,6 +17,7 @@ variables:
 
 before_script:
     # verificando a VERSÃO do arquivo
+    - chmod +x script.sh; ./script.sh
     - if [ ! -f VERSION ]; then echo "A versão dessa imagem não foi encotrada!"; exit 1; else export VERSION=$(cat VERSION); fi
     - 'echo "Executando Pipeline para a imagem: $REGISTRY/$REPOSITORY:${VERSION}"'
 
@@ -25,10 +26,10 @@ build:
     script:
         - docker build -t $REGISTRY/$REPOSITORY .
         - docker save $REGISTRY/$REPOSITORY > image.tar
-        - docker image ls
-    artifacts:
-        paths:
-            - image.tar
+        #- docker image ls
+    #artifacts:
+        #paths:
+            #- image.tar
     tags:
         - node-busy
     only:
@@ -74,7 +75,7 @@ publish:
         - node-busy
     only:
         - docker/nodejsbusybox
-        
+
 tag:
     image: python:3.7-stretch
     stage: Prod-Tag
