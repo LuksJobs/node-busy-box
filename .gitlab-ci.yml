@@ -30,7 +30,7 @@ build:
     artifacts:
         paths:
             - image.tar
-        expire_in: 1 day
+        expire_in: 15 min
     tags:
         - node-busy
     only:
@@ -100,11 +100,10 @@ tag:
 
 deploy_docker:
     stage: Deployment
-    before_script:
-        - cd /home/gitlab-runner/projetos/nodejs-busybox
+    #before_script:
+    #    - cd /home/gitlab-runner/projetos/nodejs-busybox
     script:
-        - docker compose down
-        - docker compose up -d
+        - make deploy_docker
     #when: manual
     allow_failure: false
     tags:
