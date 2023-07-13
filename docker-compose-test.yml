@@ -6,11 +6,11 @@ services:
   nodejs-busybox-test:
     env_file:
       - .env
-    #build:
-    #  context: .
-    #  dockerfile: Dockerfile
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: nodejs-busybox-test
-    image: harbor.unimednatal.com.br/busybox-nodejs/${DOCKER_USERNAME}/${APPLICATION_NAME}:${IMAGE_TAG}
+    #image: harbor.unimednatal.com.br/busybox-nodejs/${DOCKER_USERNAME}/${APPLICATION_NAME}:${IMAGE_TAG}
     ports:
       - '3080:3000'
     volumes:
