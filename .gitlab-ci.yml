@@ -38,8 +38,8 @@ build:
 
 dev-test:
     stage: Dev-test
-    before_script:
-        - cd /home/gitlab-runner/projetos/nodejs-busybox
+    #before_script:
+        #- cd /home/gitlab-runner/projetos/nodejs-busybox
     dependencies: 
         - build
     script:
