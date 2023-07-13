@@ -20,8 +20,11 @@ compose_tag:
 # 2. Substituir o campo "tag" no arquivo docker-compose.yml pelo valor extraído
 	sed -i "s/tag:.*/tag: $IMAGE_TAG/g" docker-compose.yml
 
-test:
-	docker container logs nodejs-busybox
+docker_up_test:
+	docker compose --file docker-compose-test.yml up -d
+
+docker_log_test:
+	chmod +x container-test.sh; ./container-test.sh
 	
 push: 
 	docker push harbor.unimednatal.com.br/busybox-nodejs/${DOCKER_USERNAME}/${APPLICATION_NAME}:${IMAGE_TAG}

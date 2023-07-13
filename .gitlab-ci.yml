@@ -6,7 +6,7 @@ services:
     - docker:dind
 stages:
     - Dev
-    - Dev-publish
+    - Dev-test
     - Prod-Tag
     - Prod-publish
     - Deployment
@@ -30,26 +30,27 @@ build:
     artifacts:
         paths:
             - image.tar
+        expire_in: 1 day
     tags:
         - node-busy
     only:
         - docker/nodejsbusybox
 
-dev-publish:
-    stage: Dev-publish
+dev-test:
+    stage: Dev-test
+    before_script:
+        - cd /home/gitlab-runner/projetos/nodejs-busybox
     dependencies: 
         - build
     script:
-        # verificando as variáves "$REGISTRY_USER" e "$REGISTRY_PW"
-        - if [ -z ${REGISTRY_USER+x} ]; then echo "A variável "REGISTRY_USER" não foi definida!"; exit 1; fi
-        - if [ -z ${REGISTRY_PW+x} ]; then echo "A variável "REGISTRY_PW" não foi definida!"; exit 1; fi
-        # relizando login no registro do docker (Harbor)
         - docker login -u $REGISTRY_USER -p $REGISTRY_PW $REGISTRY
         # pré-carregando versões de imagens antigas (backup)
         - docker load -i image.tar
-        # enviando nova imagem ao registro do docker (harbor)
-        - docker tag $REGISTRY/$REPOSITORY:latest $REGISTRY/$REPOSITORY:latest-dev
-        - docker push $REGISTRY/$REPOSITORY:latest-dev
+        # levantando o container de testes
+        - make docker_up_test
+        # realizando testes de disponibilidade do container de testes
+        - make docker_log_test
+    allow_failure: false
     tags:
         - node-busy
     only:
