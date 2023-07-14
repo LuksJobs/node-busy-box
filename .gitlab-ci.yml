@@ -30,7 +30,7 @@ build:
     artifacts:
         paths:
             - image.tar
-        expire_in: 15 min
+        expire_in: 10 min
     tags:
         - node-busy
     only:
