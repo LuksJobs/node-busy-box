@@ -37,9 +37,9 @@ build:
         paths:
             - image.tar
         expire_in: 10 min
-    cache:
-        paths:
-            - image.tar
+    #cache:
+        #paths:
+            #- image.tar
     tags:
         - node-busy
     only:
