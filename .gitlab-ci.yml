@@ -11,9 +11,15 @@ stages:
     - Prod-publish
     - Deployment
 
+
 variables:
     REGISTRY: harbor.unimednatal.com.br
     REPOSITORY: busybox-nodejs/unimed/nodejs-busybox 
+    FF_USE_FASTZIP: "true"
+    TRANSFER_METER_FREQUENCY: "2s"
+    ARTIFACT_COMPRESSION_LEVEL: "fastest"
+    CACHE_COMPRESSION_LEVEL: "fastest"
+
 
 before_script:
     # verificando a VERSÃO do arquivo
@@ -31,6 +37,9 @@ build:
         paths:
             - image.tar
         expire_in: 10 min
+    cache:
+        paths:
+            - image.tar
     tags:
         - node-busy
     only:
