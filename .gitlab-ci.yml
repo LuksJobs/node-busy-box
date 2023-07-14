@@ -11,15 +11,9 @@ stages:
     - Prod-publish
     - Deployment
 
-
 variables:
     REGISTRY: harbor.unimednatal.com.br
     REPOSITORY: busybox-nodejs/unimed/nodejs-busybox 
-    #FF_USE_FASTZIP: "true"
-    #TRANSFER_METER_FREQUENCY: "2s"
-    #ARTIFACT_COMPRESSION_LEVEL: "fastest"
-    #CACHE_COMPRESSION_LEVEL: "fastest"
-
 
 before_script:
     # verificando a VERSÃO do arquivo
@@ -31,6 +25,7 @@ build:
     stage: Dev
     script:
         - docker build -t $REGISTRY/$REPOSITORY .
+        #CASO SEJA NECESSÁRIO CRIAR CÓPIA DA IMG NO GITLAB ARTIFACTS
         #- docker save $REGISTRY/$REPOSITORY > image.tar
         #- docker image ls
     #artifacts:
@@ -47,8 +42,6 @@ build:
 
 dev-test:
     stage: Dev-test
-    #before_script:
-        #- cd /home/gitlab-runner/projetos/nodejs-busybox
     dependencies: 
         - build
     script:
@@ -56,8 +49,6 @@ dev-test:
         - if [ -z ${REGISTRY_PW+x} ]; then echo "REGISTRY_PW não definida!"; exit 1; fi
         # login no registro docker (Harbor)
         - docker login -u $REGISTRY_USER -p $REGISTRY_PW $REGISTRY
-        # pré-carregando versões de imagens antigas (backup)
-        #- docker load -i image.tar
         # levantando o container de testes
         - make docker_up_test
         # realizando testes de disponibilidade do container de testes
