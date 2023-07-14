@@ -15,10 +15,10 @@ stages:
 variables:
     REGISTRY: harbor.unimednatal.com.br
     REPOSITORY: busybox-nodejs/unimed/nodejs-busybox 
-    FF_USE_FASTZIP: "true"
-    TRANSFER_METER_FREQUENCY: "2s"
-    ARTIFACT_COMPRESSION_LEVEL: "fastest"
-    CACHE_COMPRESSION_LEVEL: "fastest"
+    #FF_USE_FASTZIP: "true"
+    #TRANSFER_METER_FREQUENCY: "2s"
+    #ARTIFACT_COMPRESSION_LEVEL: "fastest"
+    #CACHE_COMPRESSION_LEVEL: "fastest"
 
 
 before_script:
