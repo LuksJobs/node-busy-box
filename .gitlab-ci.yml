@@ -31,12 +31,12 @@ build:
     stage: Dev
     script:
         - docker build -t $REGISTRY/$REPOSITORY .
-        - docker save $REGISTRY/$REPOSITORY > image.tar
+        #- docker save $REGISTRY/$REPOSITORY > image.tar
         #- docker image ls
-    artifacts:
-        paths:
-            - image.tar
-        expire_in: 10 min
+    #artifacts:
+        #paths:
+            #- image.tar
+        #expire_in: 10 min
     #cache:
         #paths:
             #- image.tar
@@ -57,7 +57,7 @@ dev-test:
         # login no registro docker (Harbor)
         - docker login -u $REGISTRY_USER -p $REGISTRY_PW $REGISTRY
         # pré-carregando versões de imagens antigas (backup)
-        - docker load -i image.tar
+        #- docker load -i image.tar
         # levantando o container de testes
         - make docker_up_test
         # realizando testes de disponibilidade do container de testes
@@ -80,7 +80,7 @@ publish:
         # login no registro docker (Harbor)
         - docker login -u $REGISTRY_USER -p $REGISTRY_PW $REGISTRY
         # verificando as imagens antigas (Host)
-        - docker load -i image.tar
+        #- docker load -i image.tar
         # Enviando a nova imagem ao repositório (Harbor)
         - docker tag $REGISTRY/$REPOSITORY:latest $REGISTRY/$REPOSITORY:$VERSION
         - docker push $REGISTRY/$REPOSITORY:$VERSION
