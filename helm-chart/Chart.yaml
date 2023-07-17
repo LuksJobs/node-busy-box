@@ -1,8 +1,8 @@
 apiVersion: v1
 name: node_busybox
 home: unimednatal.com.br
-version: "8.0.3"
-appVersion: "8.0.3"
+version: "2.0.8"
+appVersion: "2.0.8"
 icon: https://unimednatal.com.br/images/min/logo-unimed-topo.png
 description: Imagem de Busy Box, com o objetivo de rodar testes de CI e best pratices docker
 sources:
