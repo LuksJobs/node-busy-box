@@ -3,5 +3,5 @@ include /home/gitlab-runner/builds/glrt-8JP/1/unimed_natal/devops/nodejs-busybox
 
 helm_tag:
 		yq -i '.image.tag = "${IMAGE_TAG}"' values.yaml 
-		yq -i '.appVersion = "${IMAGE_TAG}"' Chart.yaml
+		yq -i '.appVersion = "${IMAGE_TAG}"' Chart.yaml 
 		yq -i '.version = "${VERSION}"' Chart.yaml
