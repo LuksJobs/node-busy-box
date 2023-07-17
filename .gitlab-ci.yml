@@ -8,6 +8,7 @@ stages:
     - Dev
     - Dev-test
     - Prod-Tag
+    - Helm-Tag
     - Prod-publish
     - Deployment
 
@@ -63,7 +64,7 @@ publish:
     stage: Prod-publish
     dependencies:
         - build
-        - tag
+        - docker-tag
     script:
         # carrengando as variáveis "$REGISTRY_USER" e "$REGISTRY_PW" 
         - if [ -z ${REGISTRY_USER+x} ]; then echo "REGISTRY_USER não definida!"; exit 1; fi
@@ -80,7 +81,7 @@ publish:
     only:
         - docker/nodejsbusybox
 
-tag:
+docker-tag:
     image: python:3.7-stretch
     stage: Prod-Tag
     script:
@@ -98,7 +99,18 @@ tag:
     only:
         - docker/nodejsbusybox
 
-deploy_docker:
+helm-tag:
+    stage: Prod-Tag
+    script:
+        - cd helm-chart/; make helm_tag
+    #when: manual
+    allow_failure: false
+    tags:
+        - node-busy
+    only:
+        - docker/nodejsbusybox
+
+deploy-docker:
     stage: Deployment
     #before_script:
     #    - cd /home/gitlab-runner/projetos/nodejs-busybox
@@ -111,5 +123,21 @@ deploy_docker:
     only:
         - docker/nodejsbusybox
     environment:
-      name: staging
+      name: development
+      url: http://10.10.36.21:3015/
+
+deploy-kubernetes:
+    stage: Deployment
+    #before_script:
+    #    - cd /home/gitlab-runner/projetos/nodejs-busybox
+    script:
+        - make deploy_kubernetes
+    #when: manual
+    allow_failure: false
+    tags:
+        - node-busy
+    only:
+        - docker/nodejsbusybox
+    environment:
+      name: development
       url: http://10.10.36.21:3015/

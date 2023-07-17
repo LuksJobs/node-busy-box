@@ -1,0 +1,17 @@
+apiVersion: v1
+name: node_busybox
+home: unimednatal.com.br
+version: "8.0.3"
+appVersion: "8.0.3"
+icon: https://unimednatal.com.br/images/min/logo-unimed-topo.png
+description: Imagem de Busy Box, com o objetivo de rodar testes de CI e best pratices docker
+sources:
+  - https://gitlab.com/unimed_natal/devops/nodejs-busybox.git
+keywords:
+  - unimednatal
+  - kubernetes
+  - node_busybox
+maintainers:
+  - name: DevOps Unimed Natal
+    email: devops@unimednatal.com.br
+    url: https://tinyurl.com/devopsunimed

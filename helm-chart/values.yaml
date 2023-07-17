@@ -1,0 +1,12 @@
+## Configuração da Imagem da Node-Busybox 
+image:
+  # -- Registro da imagem do Container
+  registry: harbor.unimednatal.com.br
+  # -- Repositório onde a imagem se encontra
+  repository: harbor.unimednatal.com.br/busybox-nodejs/unimed/nodejs-busybox
+  # -- Regra de pull da imagem (agora pela versão não mais por "latest").
+  pullPolicy: IfNotPresent
+  # -- Controle de versionamento de código utilizando TAG, refeencia no arquivo "Chart.yaml".
+  tag: "8.0.3"
+service:
+  containerPort: 3000
