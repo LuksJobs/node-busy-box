@@ -4,9 +4,6 @@
 include .cicdenv
 include .env
 
-#GIT_HASH ?= $(shell git rev-parse --short HEAD) 
-# ^ CASO SE A TAG DA IMG FOSSE BASEADO NO HASH DO COMMIT
-
 build:
 	docker build --tag ${DOCKER_USERNAME}/${APPLICATION_NAME}:${IMAGE_TAG}  .
 
