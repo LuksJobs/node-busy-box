@@ -74,6 +74,8 @@ publish:
 docker-tag:
     image: python:3.7-stretch
     stage: Prod-Tag
+    dependencies:
+        - build
     script:
         - mkdir -p ~/.ssh && chmod 700 ~/.ssh
         # utilizando a chave ssh para realizar o tagueamento da nova imagem
@@ -91,6 +93,8 @@ docker-tag:
 
 helm-tag:
     stage: Prod-Tag
+    dependencies:
+        - docker-tag
     before_script:
         - cd helm-chart/
     script:
