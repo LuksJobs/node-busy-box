@@ -101,10 +101,12 @@ docker-tag:
 
 helm-tag:
     stage: Prod-Tag
+    before_script:
+        - cd helm-chart/
     script:
-        - cd helm-chart/; make helm_tag
+        - make helm_tag
     #when: manual
-    allow_failure: false
+    allow_failure: true
     tags:
         - node-busy
     only:
