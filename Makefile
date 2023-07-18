@@ -31,4 +31,4 @@ deploy_docker:
 	docker compose up -d
 
 deploy_kubernetes:
-	ssh gitlab-runner@10.10.34.21; cd /home/gitlab-runner/builds/glrt-ryY/0/unimed_natal/devops/nodejs-busybox; helm upgrade --install --set name=dev node-busybox --namespace node-busybox ./helm-chart
+	helm upgrade --install --set name=dev node-busybox --namespace node-busybox ./helm-chart

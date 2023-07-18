@@ -26,16 +26,6 @@ build:
     stage: Dev
     script:
         - docker build -t $REGISTRY/$REPOSITORY .
-        #CASO SEJA NECESSÁRIO CRIAR CÓPIA DA IMG NO GITLAB ARTIFACTS
-        #- docker save $REGISTRY/$REPOSITORY > image.tar
-        #- docker image ls
-    #artifacts:
-        #paths:
-            #- image.tar
-        #expire_in: 10 min
-    #cache:
-        #paths:
-            #- image.tar
     tags:
         - node-busy
     only:
@@ -106,7 +96,7 @@ helm-tag:
     script:
         - make helm_tag
     #when: manual
-    allow_failure: true
+    allow_failure: false
     tags:
         - node-busy
     only:
@@ -125,7 +115,7 @@ deploy-docker:
     only:
         - docker/nodejsbusybox
     environment:
-      name: development
+      name: docker_staging
       url: http://10.10.36.21:3015/
 
 deploy-kubernetes:
@@ -141,5 +131,5 @@ deploy-kubernetes:
     only:
         - docker/nodejsbusybox
     environment:
-      name: development
-      url: http://10.10.36.21:3015/
+      name: kubernetes_staging
+      url: http://10.10.34.21:3015/
