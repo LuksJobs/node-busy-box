@@ -105,6 +105,7 @@ helm-tag:
         - node-busy
     only:
         - docker/nodejsbusybox
+    needs: ["docker-tag"]
 
 deploy-docker:
     stage: Deployment
