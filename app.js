@@ -6,7 +6,7 @@ app.get('/', function (req, res) {
 });
 
 app.get('/hail', function (req, res) {
-  res.send('Hail to the king ლ,ᔑ•ﺪ͟͠•ᔐ.ლ');
+  res.send('Hail to the Queen ლ,ᔑ•ﺪ͟͠•ᔐ.ლ');
 });
 
 var port = process.env.PORT || 3000;
