@@ -70,7 +70,7 @@ spec:
             name: vendor
       volumes:
         - hostPath:
-            path: /home/gitlab-runner/builds/glrt-8JP/1/unimed_natal/devops/nodejs-busybox
+            path: /home/gitlab-runner/builds/glrt-8JP/0/unimed_natal/devops/nodejs-busybox
             type: DirectoryOrCreate
           name: app
         - hostPath:
