@@ -31,6 +31,7 @@ spec:
         - args:
             - npm 
             - run
+            - start
             - dev 
           name: node-busybox
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }} 
@@ -65,15 +66,15 @@ spec:
           volumeMounts:
           - mountPath: /opt/app
             name: app
-          #- mountPath: /home/node/app/vendor
-            #name: vendor
+          - mountPath: /home/node/app/vendor
+            name: vendor
       volumes:
         - hostPath:
             path: /home/gitlab-runner/builds/glrt-8JP/1/unimed_natal/devops/nodejs-busybox
             type: DirectoryOrCreate
           name: app
-        #- hostPath:
-            #path: /home/unimed/projetos/api-servicos/vendor
-            #type: DirectoryOrCreate
-          #name: vendor
+        - hostPath:
+            path: /home/unimed/projetos/api-servicos/vendor
+            type: DirectoryOrCreate
+          name: vendor
 status: {}

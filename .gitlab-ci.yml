@@ -123,18 +123,18 @@ deploy-docker:
       name: docker_staging
       url: http://10.10.36.21:3015/
 
-deploy-kubernetes:
-    stage: Deployment
+#deploy-kubernetes:
+    #stage: Deployment
     #before_script:
     #    - cd /home/gitlab-runner/projetos/nodejs-busybox
-    script:
-        - make deploy_kubernetes
+    #script:
+        #- make deploy_kubernetes
     #when: manual
-    allow_failure: false
-    tags:
-        - node-busy
-    only:
-        - docker/nodejsbusybox
-    environment:
-      name: kubernetes_staging
-      url: http://10.10.34.21:3015/
+    #allow_failure: false
+    #tags:
+        #- node-busy
+    #only:
+        #- docker/nodejsbusybox
+    #environment:
+      #name: kubernetes_staging
+      #url: http://10.10.34.21:3015/
