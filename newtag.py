@@ -13,7 +13,7 @@ if image_match:
     prefix = image_match.group(2)
     current_number = int(image_match.group(3))
     new_number = current_number + 1
-    new_image_value = f'IMAGE_TAG = {prefix}{new_number}'
+    new_image_value = f'IMAGE_TAG ={prefix}{new_number}'
     content = re.sub(image_pattern, new_image_value, content)
 
 # Atualizar a versão
@@ -23,7 +23,7 @@ if version_match:
     prefix = version_match.group(2)
     current_number = int(version_match.group(3))
     new_number = current_number + 1
-    new_version_value = f'VERSION = {prefix}{new_number}'
+    new_version_value = f'VERSION ={prefix}{new_number}'
     content = re.sub(version_pattern, new_version_value, content)
 
 # Escrever o conteúdo atualizado de volta para o arquivo
