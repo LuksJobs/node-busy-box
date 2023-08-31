@@ -11,9 +11,9 @@ tag:
 	docker tag ${DOCKER_USERNAME}/${APPLICATION_NAME}:${IMAGE_TAG} harbor.unimednatal.com.br/busybox-nodejs/${DOCKER_USERNAME}/${APPLICATION_NAME}:${IMAGE_TAG} 
 
 versiona_docker:
-	chmod +x newtag.py  ./script.sh
+	chmod +x newtag.py  ./newtag.py
 	chmod +x script.sh; ./script.sh
-	
+
 compose_tag:
 # 1. Extrair o valor da variável IMAGE_TAG do arquivo .env
 	IMAGE_TAG=$(sed -n 's/IMAGE_TAG=\(.*\)/\1/p' .env)
