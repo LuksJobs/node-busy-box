@@ -28,7 +28,7 @@ before_script:
 build:
     stage: Dev
     script:
-        - docker build -t $REGISTRY/$REPOSITORY .
+        - docker build --pull -t $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA .
     tags:
         - node-busy
     only:
