@@ -15,7 +15,9 @@ stages:
 
 variables:
     REGISTRY: harbor.unimednatal.com.br
-    REPOSITORY: busybox-nodejs/unimed/nodejs-busybox 
+    REPOSITORY: busybox-nodejs/unimed/nodejs-busybox
+    CONFIG_REPO_NAME: busybox-nodejs
+    PROJECT_FOLDER: nodejs-busybox 
 
 before_script:
     # verificando a VERSÃO do arquivo
@@ -65,8 +67,8 @@ publish:
         # verificando as imagens antigas (Host)
         #- docker load -i image.tar
         # Enviando a nova imagem ao repositório (Harbor)
-        - docker tag $REGISTRY/$REPOSITORY:latest $REGISTRY/$REPOSITORY:$VERSION
-        - docker push $REGISTRY/$REPOSITORY:$VERSION
+        - docker tag $REGISTRY/$REPOSITORY:latest $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA
+        - docker push $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA
     tags:
         - node-busy
     only:
@@ -152,9 +154,6 @@ change-image-tag-helm: &change-image-tag-helm
       - node-busy
   only:
       - docker/nodejsbusybox
-  variables:
-    CONFIG_REPO_NAME: busybox-nodejs
-    PROJECT_FOLDER: nodejs-busybox
   before_script:
     - git config --global user.email "devops@unimednatal.com.br" && git config --global user.name "devopsunimed"    
   script:
@@ -165,11 +164,11 @@ change-image-tag-helm: &change-image-tag-helm
     - echo "Listando arquivos"
     - ls -lh
     - git remote -v
-    - git checkout -b $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
-    - 'ls values.yaml | xargs sed -i -r "s/tag: (.*)/tag: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA/g"'
+    #- git checkout -b $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
+    - 'ls values.yaml | xargs sed -i -r "s/tag: (.*)/tag: $CI_COMMIT_SHORT_SHA/g"'
     - git status
     - git add .
     - git commit -m "Atualizando imagem através do repositório $CI_PROJECT_NAME - $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA"
-    - git push origin $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
+    - git push -u #$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
   only:
     - docker/nodejsbusybox
