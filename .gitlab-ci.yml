@@ -147,6 +147,7 @@ change-image-tag-helm: &change-image-tag-helm
     entrypoint: [ '/bin/bash', '-c', 'ln -snf /bin/bash /bin/sh && /bin/bash -c $0' ] 
     
   stage: change-image-tag
+  allow_failure: yes
   tags:
       - node-busy
   only:
@@ -165,7 +166,7 @@ change-image-tag-helm: &change-image-tag-helm
     - ls -lh
     - git remote -v
     - git checkout -b $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
-    - 'ls $PROJECT_FOLDER/values.yaml | xargs sed -i -r "s/tag: (.*)/tag: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA/g"'
+    - 'ls values.yaml | xargs sed -i -r "s/tag: (.*)/tag: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA/g"'
     - git status
     - git add .
     - git commit -m "Atualizando imagem através do repositório $CI_PROJECT_NAME - $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA"
