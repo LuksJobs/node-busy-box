@@ -11,6 +11,7 @@ stages:
     - Helm-Tag
     - Prod-publish
     - Deployment
+    - change-image-tag
 
 variables:
     REGISTRY: harbor.unimednatal.com.br
@@ -138,3 +139,32 @@ deploy-docker:
     #environment:
       #name: kubernetes_staging
       #url: http://10.10.34.21:3015/
+
+
+change-image-tag-helm: &change-image-tag-helm
+  image: 
+    name: robertsilvatech/ubuntu-with-git:20.04
+    entrypoint: [ '/bin/bash', '-c', 'ln -snf /bin/bash /bin/sh && /bin/bash -c $0' ] 
+    
+  stage: change-image-tag
+  variables:
+    CONFIG_REPO_NAME: busybox-nodejs
+    PROJECT_FOLDER: nodejs-busybox
+  before_script:
+    - git config --global user.email "devops@unimednatal.com.br" && git config --global user.name "devopsunimed"    
+  script:
+    - echo "cloning config repo $CONFIG_REPO_NAME"
+    - git clone "https://$CI_USER:$CI_USER_TOKEN@gitlab.com/unimed_natal/devops/helmcharts/busybox-nodejs"
+    - echo "Entrando no diretório $CONFIG_REPO_NAME"
+    - cd $CONFIG_REPO_NAME
+    - echo "Listando arquivos"
+    - ls -lh
+    - git remote -v
+    - git checkout -b $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
+    - 'ls $PROJECT_FOLDER/helm/values-$CI_COMMIT_REF_SLUG*.yaml | xargs sed -i -r "s/tag: (.*)/tag: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA/g"'
+    - git status
+    - git add .
+    - git commit -m "Atualizando imagem através do $CI_PROJECT_NAME - $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA"
+    - git push origin $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
+  only:
+    - dev
