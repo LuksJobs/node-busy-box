@@ -147,6 +147,10 @@ change-image-tag-helm: &change-image-tag-helm
     entrypoint: [ '/bin/bash', '-c', 'ln -snf /bin/bash /bin/sh && /bin/bash -c $0' ] 
     
   stage: change-image-tag
+  tags:
+      - node-busy
+  only:
+      - docker/nodejsbusybox
   variables:
     CONFIG_REPO_NAME: busybox-nodejs
     PROJECT_FOLDER: nodejs-busybox
@@ -167,4 +171,4 @@ change-image-tag-helm: &change-image-tag-helm
     - git commit -m "Atualizando imagem através do $CI_PROJECT_NAME - $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA"
     - git push origin $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
   only:
-    - dev
+    - docker/nodejsbusybox
