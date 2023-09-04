@@ -7,11 +7,10 @@ services:
 stages:
     - Dev
     - Dev-test
-    - Prod-Tag
-    - Helm-Tag
+    - Gitlab_Tag
     - Prod-publish
     - Deployment
-    - change-image-tag
+    - Kubernetes_Deploy
 
 variables:
     REGISTRY: harbor.unimednatal.com.br
@@ -53,11 +52,25 @@ dev-test:
     only:
         - docker/nodejsbusybox
 
+git-tag:
+  stage: Gitlab_Tag
+  allow_failure: yes
+  dependencies:
+        - build
+  tags:
+      - node-busy
+  only:
+      - docker/nodejsbusybox
+  script:
+    - export COMMIT_SHORT_SHA=$(git rev-parse --short HEAD)  # Pega o SHA curto do commit atual
+    - git tag $COMMIT_SHORT_SHA  # Cria uma tag com o COMMIT_SHORT_SHA
+    - git push origin $COMMIT_SHORT_SHA  # Envia a nova tag para o repositório no GitLab
+  needs: ["build","dev-test"]
+
 publish:
     stage: Prod-publish
     dependencies:
         - build
-        - docker-tag
     script:
         # carrengando as variáveis "$REGISTRY_USER" e "$REGISTRY_PW" 
         - if [ -z ${REGISTRY_USER+x} ]; then echo "REGISTRY_USER não definida!"; exit 1; fi
@@ -73,58 +86,59 @@ publish:
         - node-busy
     only:
         - docker/nodejsbusybox
+    needs: ["build","dev-test","git-tag"]
 
-docker-tag:
-    image: python:3.7-stretch
-    stage: Prod-Tag
-    dependencies:
-        - build
-    script:
-        - mkdir -p ~/.ssh && chmod 700 ~/.ssh
+#docker-tag:
+#    image: python:3.7-stretch
+#    stage: Prod-Tag
+#    dependencies:
+#        - build
+#    script:
+#        - mkdir -p ~/.ssh && chmod 700 ~/.ssh
         # utilizando a chave ssh para realizar o tagueamento da nova imagem
-        - ssh-keyscan gitlab.com >> ~/.ssh/known_hosts && chmod 644 ~/.ssh/known_hosts
-        - eval $(ssh-agent -s)
+#        - ssh-keyscan gitlab.com >> ~/.ssh/known_hosts && chmod 644 ~/.ssh/known_hosts
+#        - eval $(ssh-agent -s)
         #- echo -n "$SSH_DEPLOY_KEY" | tr -d '\r' | ssh-add - > /dev/null
-        - chmod +x tag.py
-        - ./tag.py
+#        - chmod +x tag.py
+#        - ./tag.py
     #when: manual
-    allow_failure: false
-    tags:
-        - node-busy
-    only:
-        - docker/nodejsbusybox
+#    allow_failure: false
+#    tags:
+#        - node-busy
+#    only:
+#        - docker/nodejsbusybox
 
-helm-tag:
-    stage: Prod-Tag
-    dependencies:
-        - docker-tag
-    before_script:
-        - cd helm-chart/
-    script:
-        - make helm_tag
-    #when: manual
-    allow_failure: false
-    tags:
-        - node-busy
-    only:
-        - docker/nodejsbusybox
-    needs: ["docker-tag"]
+# helm-tag:
+#     stage: Prod-Tag
+#     dependencies:
+#         - docker-tag
+#     before_script:
+#         - cd helm-chart/
+#     script:
+#         - make helm_tag
+#     #when: manual
+#     allow_failure: false
+#     tags:
+#         - node-busy
+#     only:
+#         - docker/nodejsbusybox
+#     needs: ["docker-tag"]
 
-deploy-docker:
-    stage: Deployment
-    #before_script:
-    #    - cd /home/gitlab-runner/projetos/nodejs-busybox
-    script:
-        - make deploy_docker
-    #when: manual
-    allow_failure: false
-    tags:
-        - node-busy
-    only:
-        - docker/nodejsbusybox
-    environment:
-      name: docker_staging
-      url: http://10.10.36.21:3015/
+# deploy-docker:
+#     stage: Deployment
+#     #before_script:
+#     #    - cd /home/gitlab-runner/projetos/nodejs-busybox
+#     script:
+#         - make deploy_docker
+#     #when: manual
+#     allow_failure: false
+#     tags:
+#         - node-busy
+#     only:
+#         - docker/nodejsbusybox
+#     environment:
+#       name: docker_staging
+#       url: http://10.10.36.21:3015/
 
 #deploy-kubernetes:
     #stage: Deployment
@@ -143,13 +157,13 @@ deploy-docker:
       #url: http://10.10.34.21:3015/
 
 
-change-image-tag-helm: &change-image-tag-helm
+argocd-deployment: &argocd-deployment
   image: 
     name: harbor.unimednatal.com.br/ubuntu-git/unimed/ubuntu:git
     entrypoint: [ '/bin/bash', '-c', 'ln -snf /bin/bash /bin/sh && /bin/bash -c $0' ] 
     
-  stage: change-image-tag
-  allow_failure: yes
+  stage: Kubernetes_Deploy
+  allow_failure: no
   tags:
       - node-busy
   only:
@@ -173,3 +187,4 @@ change-image-tag-helm: &change-image-tag-helm
     - git push -u #$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
   only:
     - docker/nodejsbusybox
+  needs: ["build","dev-test","git-tag","publish"]
