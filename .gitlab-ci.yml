@@ -145,7 +145,7 @@ deploy-docker:
 
 change-image-tag-helm: &change-image-tag-helm
   image: 
-    name: robertsilvatech/ubuntu-with-git:20.04
+    name: harbor.unimednatal.com.br/ubuntu-git/unimed/ubuntu:git
     entrypoint: [ '/bin/bash', '-c', 'ln -snf /bin/bash /bin/sh && /bin/bash -c $0' ] 
     
   stage: change-image-tag
