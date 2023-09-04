@@ -19,10 +19,7 @@ variables:
     PROJECT_FOLDER: nodejs-busybox 
 
 before_script:
-    # verificando a VERSÃO do arquivo
-    - make versiona_docker
-    - if [ ! -f VERSION ]; then echo "A versão dessa imagem não foi encotrada!"; exit 1; else export VERSION=$(cat VERSION); fi
-    - 'echo "Executando Pipeline para a imagem: $REGISTRY/$REPOSITORY:${VERSION}"'
+    - 'echo "Executando Pipeline para a imagem: $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA"'
 
 build:
     stage: Dev
