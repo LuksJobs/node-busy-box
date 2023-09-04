@@ -157,7 +157,7 @@ change-image-tag-helm: &change-image-tag-helm
   before_script:
     - git config --global user.email "devops@unimednatal.com.br" && git config --global user.name "devopsunimed"    
   script:
-    - echo "cloning config repo $CONFIG_REPO_NAME"
+    - echo "Clonando o repositório configurado $CONFIG_REPO_NAME"
     - git clone "https://$CI_USER:$CI_USER_TOKEN@gitlab.com/unimed_natal/devops/helmcharts/busybox-nodejs"
     - echo "Entrando no diretório $CONFIG_REPO_NAME"
     - cd $CONFIG_REPO_NAME
@@ -166,6 +166,7 @@ change-image-tag-helm: &change-image-tag-helm
     - git remote -v
     #- git checkout -b $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
     - 'ls values.yaml | xargs sed -i -r "s/tag: (.*)/tag: $CI_COMMIT_SHORT_SHA/g"'
+    - echo "Imagem versionada com a hash do commit $CI_COMMIT_SHORT_SHA"
     - git status
     - git add .
     - git commit -m "Atualizando imagem através do repositório $CI_PROJECT_NAME - $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA"
