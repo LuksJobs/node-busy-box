@@ -54,7 +54,7 @@ docker_scan:
     stage: docker_scan
     image: aquasec/trivy:latest
     script:
-        - trivy image $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA
+        - trivy --format table $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA
     tags:
         - node-busy
     only:
