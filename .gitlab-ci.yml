@@ -1,5 +1,5 @@
-## NodeJS Unimed - Busybox - rodando no ambiente de desenvolvimento
-# Este projeto é voltado para testes unistário em estágios do CI;
+## API - Serviços - rodando no ambiente de produção
+# Este projeto é voltado para o CI/CD;
 
 image: docker:latest
 services:
@@ -7,6 +7,7 @@ services:
 stages:
     - Dev
     - Dev-test
+    - docker_scan
     - Gitlab_Tag
     - Prod-publish
     - Deployment
@@ -14,9 +15,9 @@ stages:
 
 variables:
     REGISTRY: harbor.unimednatal.com.br
-    REPOSITORY: busybox-nodejs/unimed/nodejs-busybox
-    CONFIG_REPO_NAME: busybox-nodejs
-    PROJECT_FOLDER: nodejs-busybox 
+    REPOSITORY: api-servicos-prod/unimed/api-servicos
+    CONFIG_REPO_NAME: api-servicos
+    #PROJECT_FOLDER: nodejs-busybox 
 
 before_script:
     - 'echo "Executando Pipeline para a imagem: $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA"'
@@ -26,9 +27,9 @@ build:
     script:
         - docker build --pull -t $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA .
     tags:
-        - node-busy
+        - api-servicos
     only:
-        - docker/nodejsbusybox
+        - release/production
 
 dev-test:
     stage: Dev-test
@@ -45,9 +46,15 @@ dev-test:
         - make docker_log_test
     allow_failure: false
     tags:
-        - node-busy
+        - api-servicos
     only:
-        - docker/nodejsbusybox
+        - release/production
+
+docker_scan:
+    stage: docker_scan
+    image: aquasec/trivy:latest
+    script:
+        - trivy --exit-code 1 --severity HIGH --no-progress $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA
 
 git-tag:
   stage: Gitlab_Tag
@@ -55,9 +62,9 @@ git-tag:
   dependencies:
         - build
   tags:
-      - node-busy
+      - api-servicos
   only:
-      - docker/nodejsbusybox
+      - release/production
   script:
     - export COMMIT_SHORT_SHA=$(git rev-parse --short HEAD)  # Pega o SHA curto do commit atual
     - git tag $COMMIT_SHORT_SHA  # Cria uma tag com o COMMIT_SHORT_SHA
@@ -80,9 +87,9 @@ publish:
         - docker tag $REGISTRY/$REPOSITORY:latest $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA
         - docker push $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA
     tags:
-        - node-busy
+        - api-servicos
     only:
-        - docker/nodejsbusybox
+        - release/production
     needs: ["build","dev-test","git-tag"]
 
 
@@ -94,9 +101,9 @@ argocd-deployment: &argocd-deployment
   stage: Kubernetes_Deploy
   allow_failure: no
   tags:
-      - node-busy
+      - api-servicos
   only:
-      - docker/nodejsbusybox
+      - release/production
   before_script:
     - git config --global user.email "devops@unimednatal.com.br" && git config --global user.name "devopsunimed"    
   script:
@@ -115,5 +122,5 @@ argocd-deployment: &argocd-deployment
     - git commit -m "Atualizando imagem através do repositório $CI_PROJECT_NAME - $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA"
     - git push -u #$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
   only:
-    - docker/nodejsbusybox
+    - release/production
   needs: ["build","dev-test","git-tag","publish"]
