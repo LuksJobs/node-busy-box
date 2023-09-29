@@ -15,8 +15,8 @@ stages:
 
 variables:
     REGISTRY: harbor.unimednatal.com.br
-    REPOSITORY: api-servicos-prod/unimed/api-servicos
-    CONFIG_REPO_NAME: api-servicos
+    REPOSITORY: busybox-nodejs/unimed/nodejs-busybox
+    CONFIG_REPO_NAME: busybox-nodejs
     #PROJECT_FOLDER: nodejs-busybox 
 
 before_script:
@@ -27,9 +27,9 @@ build:
     script:
         - docker build --pull -t $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA .
     tags:
-        - api-servicos
+        - node-busy
     only:
-        - release/production
+        - docker/nodejsbusybox
 
 dev-test:
     stage: Dev-test
@@ -46,15 +46,19 @@ dev-test:
         - make docker_log_test
     allow_failure: false
     tags:
-        - api-servicos
+        - node-busy
     only:
-        - release/production
+        - docker/nodejsbusybox
 
 docker_scan:
     stage: docker_scan
     image: aquasec/trivy:latest
     script:
-        - trivy --exit-code 1 --severity HIGH --no-progress $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA
+    - trivy --exit-code 1 --severity HIGH --no-progress myapp
+    tags:
+        - node-busy
+    only:
+        - docker/nodejsbusybox
 
 git-tag:
   stage: Gitlab_Tag
@@ -62,14 +66,14 @@ git-tag:
   dependencies:
         - build
   tags:
-      - api-servicos
+      - node-busy
   only:
-      - release/production
+      - docker/nodejsbusybox
   script:
     - export COMMIT_SHORT_SHA=$(git rev-parse --short HEAD)  # Pega o SHA curto do commit atual
     - git tag $COMMIT_SHORT_SHA  # Cria uma tag com o COMMIT_SHORT_SHA
     - git push origin $COMMIT_SHORT_SHA  # Envia a nova tag para o repositório no GitLab
-  needs: ["build","dev-test"]
+  needs: ["build","dev-test", "docker_scan"]
 
 publish:
     stage: Prod-publish
@@ -87,10 +91,10 @@ publish:
         - docker tag $REGISTRY/$REPOSITORY:latest $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA
         - docker push $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA
     tags:
-        - api-servicos
+        - node-busy
     only:
-        - release/production
-    needs: ["build","dev-test","git-tag"]
+        - docker/nodejsbusybox
+    needs: ["build","dev-test","docker_scan","git-tag"]
 
 
 argocd-deployment: &argocd-deployment
@@ -101,9 +105,9 @@ argocd-deployment: &argocd-deployment
   stage: Kubernetes_Deploy
   allow_failure: no
   tags:
-      - api-servicos
+      - node-busy
   only:
-      - release/production
+      - docker/nodejsbusybox
   before_script:
     - git config --global user.email "devops@unimednatal.com.br" && git config --global user.name "devopsunimed"    
   script:
@@ -122,5 +126,5 @@ argocd-deployment: &argocd-deployment
     - git commit -m "Atualizando imagem através do repositório $CI_PROJECT_NAME - $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA"
     - git push -u #$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
   only:
-    - release/production
-  needs: ["build","dev-test","git-tag","publish"]
+    - docker/nodejsbusybox
+  needs: ["build","dev-test","git-tag","docker_scan","publish"]
