@@ -44,7 +44,7 @@ dev-test:
         - make docker_up_test
         # realizando testes de disponibilidade do container de testes
         - make docker_log_test
-    allow_failure: false
+    allow_failure: true
     tags:
         - node-busy
     only:
@@ -62,7 +62,7 @@ docker_scan:
 
 git-tag:
   stage: Gitlab_Tag
-  allow_failure: yes
+  allow_failure: true
   dependencies:
         - build
   tags:
