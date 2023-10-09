@@ -54,7 +54,8 @@ docker_scan:
     stage: docker_scan
     image: aquasec/trivy:latest
     script:
-        - trivy image --format json "results/report.json" $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA
+        - trivy image $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA
+        - echo "enviando relatório para equipe de segurança" && ./results.sh
     tags:
         - node-busy
     only:
