@@ -31,7 +31,7 @@ build:
     tags:
         - node-local
     only:
-        - node-local
+        - docker/nodejsbusybox
 
 dev-test:
     stage: Dev-test
@@ -50,7 +50,7 @@ dev-test:
     tags:
         - node-local
     only:
-        - node-local
+        - docker/nodejsbusybox
 
 docker_scan:
     stage: docker_scan
@@ -61,7 +61,7 @@ docker_scan:
     tags:
         - node-local
     only:
-        - node-local
+        - docker/nodejsbusybox
 
 sonarqube-check:
   stage: sonarqube-check
@@ -83,6 +83,7 @@ sonarqube-check:
     - master
     - main
     - develop
+    - docker/nodejsbusybox
   tags:
         - node-local
 
@@ -96,7 +97,7 @@ sonarqube-vulnerability-report:
     - master
     - main
     - develop
-    - node-local
+    - docker/nodejsbusybox
   tags:
         - node-local
   artifacts:
@@ -115,7 +116,7 @@ git-tag:
   tags:
       - node-local
   only:
-      - node-local
+      - docker/nodejsbusybox
   script:
     - export COMMIT_SHORT_SHA=$(git rev-parse --short HEAD)  # Pega o SHA curto do commit atual
     - git tag $COMMIT_SHORT_SHA  # Cria uma tag com o COMMIT_SHORT_SHA
@@ -140,7 +141,7 @@ publish:
     tags:
         - node-local
     only:
-        - node-local
+        - docker/nodejsbusybox
     needs: ["build","dev-test","docker_scan","git-tag"]
 
 
@@ -154,7 +155,7 @@ argocd-deployment: &argocd-deployment
   tags:
       - node-local
   only:
-      - node-local
+      - docker/nodejsbusybox
   before_script:
     - git config --global user.email "devops@unimednatal.com.br" && git config --global user.name "devopsunimed"    
   script:
@@ -173,5 +174,5 @@ argocd-deployment: &argocd-deployment
     - git commit -m "Atualizando imagem através do repositório $CI_PROJECT_NAME - $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA"
     - git push -u #$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
   only:
-    - node-local
+    - docker/nodejsbusybox
   needs: ["build","dev-test","git-tag","docker_scan","publish"]
