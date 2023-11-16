@@ -136,7 +136,7 @@ publish:
         # verificando as imagens antigas (Host)
         #- docker load -i image.tar
         # Enviando a nova imagem ao repositório (Harbor)
-        - docker tag $REGISTRY/$REPOSITORY:latest $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA
+        - docker tag $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA
         - docker push $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA
     tags:
         - node-local
