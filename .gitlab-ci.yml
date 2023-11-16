@@ -8,6 +8,8 @@ stages:
     - Dev
     - Dev-test
     - docker_scan
+    - sonarqube-check
+    - sonarqube-vulnerability-report
     - Gitlab_Tag
     - Prod-publish
     - Deployment
@@ -27,9 +29,9 @@ build:
     script:
         - docker build --pull -t $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA .
     tags:
-        - node-busy
+        - node-local
     only:
-        - docker/nodejsbusybox
+        - node-local
 
 dev-test:
     stage: Dev-test
@@ -46,9 +48,9 @@ dev-test:
         - make docker_log_test
     allow_failure: true
     tags:
-        - node-busy
+        - node-local
     only:
-        - docker/nodejsbusybox
+        - node-local
 
 docker_scan:
     stage: docker_scan
@@ -57,9 +59,53 @@ docker_scan:
         - trivy image $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA
         - echo "Enviando relatório do repositório $CI_PROJECT_NAME para equipe de Segurança ..." && ./results.sh
     tags:
-        - node-busy
+        - node-local
     only:
-        - docker/nodejsbusybox
+        - node-local
+
+sonarqube-check:
+  stage: sonarqube-check
+  image: 
+    name: sonarsource/sonar-scanner-cli:5.0
+    entrypoint: [""]
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
+    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script: 
+    - sonar-scanner
+  allow_failure: true
+  only:
+    - merge_requests
+    - master
+    - main
+    - develop
+  tags:
+        - node-local
+
+sonarqube-vulnerability-report:
+  stage: sonarqube-check
+  script:
+    - 'curl -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/issues/gitlab_sast_export?projectKey=unimed_natal_devops_nodejs-busybox_AYvPaXyB9HuO83tk9aP7&branch=${CI_COMMIT_BRANCH}&pullRequest=${CI_MERGE_REQUEST_IID}" -o gl-sast-sonar-report.json'
+  allow_failure: true
+  only:
+    - merge_requests
+    - master
+    - main
+    - develop
+    - node-local
+  tags:
+        - node-local
+  artifacts:
+    expire_in: 1 day
+    reports:
+      sast: gl-sast-sonar-report.json
+  dependencies:
+    - sonarqube-check
+  needs: ["dev-test", "docker_scan", "sonarqube-check"]
 
 git-tag:
   stage: Gitlab_Tag
@@ -67,14 +113,14 @@ git-tag:
   dependencies:
         - build
   tags:
-      - node-busy
+      - node-local
   only:
-      - docker/nodejsbusybox
+      - node-local
   script:
     - export COMMIT_SHORT_SHA=$(git rev-parse --short HEAD)  # Pega o SHA curto do commit atual
     - git tag $COMMIT_SHORT_SHA  # Cria uma tag com o COMMIT_SHORT_SHA
     - git push origin $COMMIT_SHORT_SHA  # Envia a nova tag para o repositório no GitLab
-  needs: ["build","dev-test", "docker_scan"]
+  needs: ["build","dev-test", "docker_scan", "sonarqube-vulnerability-report"]
 
 publish:
     stage: Prod-publish
@@ -92,9 +138,9 @@ publish:
         - docker tag $REGISTRY/$REPOSITORY:latest $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA
         - docker push $REGISTRY/$REPOSITORY:$CI_COMMIT_SHORT_SHA
     tags:
-        - node-busy
+        - node-local
     only:
-        - docker/nodejsbusybox
+        - node-local
     needs: ["build","dev-test","docker_scan","git-tag"]
 
 
@@ -106,9 +152,9 @@ argocd-deployment: &argocd-deployment
   stage: Kubernetes_Deploy
   allow_failure: no
   tags:
-      - node-busy
+      - node-local
   only:
-      - docker/nodejsbusybox
+      - node-local
   before_script:
     - git config --global user.email "devops@unimednatal.com.br" && git config --global user.name "devopsunimed"    
   script:
@@ -127,5 +173,5 @@ argocd-deployment: &argocd-deployment
     - git commit -m "Atualizando imagem através do repositório $CI_PROJECT_NAME - $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA"
     - git push -u #$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
   only:
-    - docker/nodejsbusybox
+    - node-local
   needs: ["build","dev-test","git-tag","docker_scan","publish"]
