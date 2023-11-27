@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline de Homologação
 
 on:
   push:
@@ -14,15 +14,17 @@ jobs:
         run: docker build -t luks/node:dev .
 
   test:
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Test Docker image
         run: docker run --rm luks/node:dev
-
+  
   deploy:
+    needs: [build, test]
     runs-on: busybox-node
-    steps:
+    steps:      
       - uses: actions/checkout@v2
       - name: Deploy Docker image
         run: docker compose up -d
