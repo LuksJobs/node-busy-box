@@ -1,0 +1,28 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - release/staging
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Docker image
+        run: docker build -t luks/node:dev .
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Test Docker image
+        run: docker run --rm luks/node:dev
+
+  deploy:
+    runs-on: busybox-node
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy Docker image
+        run: docker compose up -d
