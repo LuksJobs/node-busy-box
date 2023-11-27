@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: busybox-node
     steps:
       - uses: actions/checkout@v2
       - name: Build Docker image
@@ -15,7 +15,7 @@ jobs:
 
   test:
     needs: [build]
-    runs-on: ubuntu-latest
+    runs-on: busybox-node
     steps:
       - uses: actions/checkout@v2
       - name: Test Docker image
