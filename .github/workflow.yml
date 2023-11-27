@@ -14,7 +14,7 @@ jobs:
         run: docker build -t luks/node:dev .
 
   test:
-    needs: build
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -22,7 +22,7 @@ jobs:
         run: docker run --rm luks/node:dev
   
   deploy:
-    needs: ["build", "test"]
+    needs: [build, test]
     runs-on: busybox-node
     steps:      
       - uses: actions/checkout@v2
