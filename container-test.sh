@@ -3,7 +3,7 @@
  CONTAINER_NAME="nodejs-busybox-test"
 # Verifica se o container está em execução
 if docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
-    echo "O Container de testes está rodando. Confira os logs abaixo:"
+    echo "O Container de testes está em execução. Confira os logs abaixo:"
      # Mostra os logs do container
     docker logs "${CONTAINER_NAME}"
      # Verifica se o container está execuntando normalmente
